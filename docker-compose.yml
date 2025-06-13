@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dbp:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: myuserp
+      POSTGRES_PASSWORD: mypasswordp
+      POSTGRES_DB: mydatabasep
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_datap:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydatabase
+    depends_on:
+      - db
+    restart: always
+
+  webp:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      DATABASE_URL: postgresql://myuserp:mypasswordp@dbp:5432/mydatabasep
+    depends_on:
+      - dbp
+    command: python appp.py  # Ejecuta el archivo para productos
+    restart: always
+
+volumes:
+  postgres_data:
+  postgres_datap:
