@@ -43,6 +43,16 @@ services:
       - dbp
     command: python appp.py  # Ejecuta el archivo para productos
     restart: always
+  webp2:
+    build: .
+    ports:
+      - "5002:5000"
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydatabase
+    depends_on:
+      - db
+    command: python applogin.py
+    restart: always
 
 volumes:
   postgres_data:

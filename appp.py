@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify,request
+from flask_cors import CORS
 from models import dbp, Product
 from config import ConfigP
 
 app = Flask(__name__)
+CORS(app)
 app.config.from_object(ConfigP)
 dbp.init_app(app)
 
@@ -22,10 +24,13 @@ def get_products():
     products = Product.query.all()
     return jsonify([{'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price} for product in products])
 
+
+
 @app.route('/products/<int:id>', methods=['GET'])
 def get_product(id):
     product = Product.query.get_or_404(id)
     return jsonify({'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price})
+
 
 @app.route('/products/<int:id>', methods=['PUT'])
 def update_product(id):

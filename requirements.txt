@@ -1,4 +1,5 @@
 Flask
+requests
 psycopg2-binary
 Flask-SQLAlchemy
 flask-cors
