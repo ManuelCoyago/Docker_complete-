@@ -8,8 +8,27 @@ CORS(app)
 app.config.from_object(ConfigP)
 dbp.init_app(app)
 
+def create_initial_products():
+    # Verificar si ya existen productos para no duplicar
+    if not Product.query.first():
+        product1 = Product(
+            name='Laptop Premium',
+            description='Laptop de última generación con 16GB RAM',
+            price=1299.99
+        )
+        product2 = Product(
+            name='Smartphone Pro',
+            description='Teléfono inteligente con cámara 108MP',
+            price=899.99
+        )
+        dbp.session.add_all([product1, product2])
+        dbp.session.commit()
+
 with app.app_context():
     dbp.create_all()
+    create_initial_products()  # Crear productos iniciales al iniciar
+
+
 
 @app.route('/products', methods=['POST'])
 def create_product():

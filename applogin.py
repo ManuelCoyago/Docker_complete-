@@ -11,7 +11,7 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
-
+    
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -22,34 +22,26 @@ def login():
         return jsonify({'message': 'Email y contraseña son requeridos'}), 400
 
     user = User.query.filter_by(email=email).first()
+    
     if user and user.password == password:
-        # Determinar rol basado en el email
-        role = 'user'
-        if email.startswith('admin@example.com'):
-            role = 'admin'
-        elif email.startswith('adminP@example.com'):
-            role = 'adminP'
+        # Obtener el rol directamente del usuario en la base de datos
+        role = user.role if user.role else 'user'  # Default a 'user' si no tiene rol
+        
+        # Llamar al servicio de productos (solo si no es admin)
+        products = []
+        if role != 'admin':
+            try:
+                response = requests.get("http://webp:5000/products")
+                if response.ok:
+                    products = response.json()
+            except Exception as e:
+                print(f"Error obteniendo productos: {str(e)}")
 
-        # Llamar al servicio de productos
-        try:
-            response = requests.get("http://webp:5000/products")
-            if response.ok:
-                products = response.json()
-                return jsonify({
-                    'message': 'Login exitoso',
-                    'role': role,
-                    'products': products
-                }), 200
-            else:
-                return jsonify({
-                    'message': 'Login exitoso, pero error obteniendo productos',
-                    'role': role
-                }), 200
-        except Exception as e:
-            return jsonify({
-                'message': f'Login exitoso, pero no se pudo conectar con productos: {str(e)}',
-                'role': role
-            }), 200
+        return jsonify({
+            'message': 'Login exitoso',
+            'role': role,
+            'products': products if products else []
+        }), 200
     else:
         return jsonify({'message': 'Credenciales inválidas'}), 401
 
