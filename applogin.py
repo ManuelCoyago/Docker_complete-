@@ -24,9 +24,8 @@ def login():
     user = User.query.filter_by(email=email).first()
     
     if user and user.password == password:
-        # Obtener el rol directamente del usuario en la base de datos
-        role = user.role if user.role else 'user'  # Default a 'user' si no tiene rol
-        
+        role = user.role if user.role else 'user'
+
         # Llamar al servicio de productos (solo si no es admin)
         products = []
         if role != 'admin':
@@ -37,11 +36,14 @@ def login():
             except Exception as e:
                 print(f"Error obteniendo productos: {str(e)}")
 
+        # Todos los usuarios requieren 2FA
         return jsonify({
-            'message': 'Login exitoso',
+            'requires_2fa': True,
+            'email': user.email,
             'role': role,
             'products': products if products else []
         }), 200
+
     else:
         return jsonify({'message': 'Credenciales inválidas'}), 401
 

@@ -4,3 +4,6 @@ psycopg2-binary
 Flask-SQLAlchemy
 flask-cors
 flask-jwt-extended
+pyotp
+qrcode
+Pillow   # 👈 Necesario para que qrcode genere imágenes

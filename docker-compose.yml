@@ -58,6 +58,27 @@ services:
     ports:
       - "3000:3000"
 
+  auth2fa:
+    build: .
+    ports:
+      - "5004:5000"
+    environment:
+      DATABASE_URL: postgresql://authuser:authpass@auth-db:5432/authdb
+    depends_on:
+      - auth-db
+    command: python authlogin.py  # 👈 Aquí defines el comando de ejecución
+
+
+  auth-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+      POSTGRES_DB: authdb
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+
 volumes:
   postgres_data:
   postgres_datap:
+  auth_data:
